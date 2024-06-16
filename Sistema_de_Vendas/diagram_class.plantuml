@@ -1,4 +1,4 @@
-@startuml
+@startuml ClassDiagram
 class Cliente {
   - nome: String
   - email: String

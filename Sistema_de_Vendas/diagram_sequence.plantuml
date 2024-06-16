@@ -1,0 +1,27 @@
+@startuml SequenceDiagram
+
+actor Cliente
+participant "Cliente" as C
+participant "Pedido" as P
+participant "ItemPedido" as IP
+participant "Pagamento" as Pg
+
+C -> P: realizarPedido()
+activate P
+P -> IP: adicionarItem()
+activate IP
+IP -> P: calcularSubtotal()
+deactivate IP
+P -> Pg: processarPagamento()
+activate Pg
+Pg -> P: confirmarPagamento()
+deactivate Pg
+P -> C: Pedido realizado
+deactivate P
+
+actor Administrador
+
+Administrador -> Produto : atualizarEstoque()
+Administrador -> Produto : aplicarDesconto()
+
+@enduml

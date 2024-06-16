@@ -98,6 +98,10 @@ Ações dos Usuários no Sistema
 
 ## Diagrama de Sequência (Com base no caso de uso "Realizar Pedido")
 
+<div align="center">
+<img alt="Imagem de um Diagrama de Sequencia" title="Diagrama de Sequencias" width="350px" src="">
+</div>
+
 #### Classes e Métodos no Caso de Uso "Realizar Pedido"
 
 No caso de uso "Realizar Pedido", o usuário (Cliente) interage com as seguintes classes:
