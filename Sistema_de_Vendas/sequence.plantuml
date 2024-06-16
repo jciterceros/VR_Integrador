@@ -7,6 +7,11 @@ class Cliente {
   + cancelarPedido()
 }
 
+class Administrador {
+  + atualizarEstoque()
+  + aplicarDesconto()
+}
+
 class Produto {
   - id: int
   - nome: String
@@ -39,10 +44,8 @@ class Pagamento {
   + confirmarPagamento()
 }
 
-' Cliente --> Pedido
-' Pedido --> ItemPedido
-' Pedido --> Pagamento
 Cliente "1" -- "0..*" Pedido
+Administrador -- Produto
 Pedido "1" -- "1..*" ItemPedido
 ItemPedido "1" -- "1" Produto
 Pedido "1" -- "1" Pagamento
