@@ -99,7 +99,7 @@ Ações dos Usuários no Sistema
 ## Diagrama de Sequência (Com base no caso de uso "Realizar Pedido")
 
 <div align="center">
-<img alt="Imagem de um Diagrama de Sequencia" title="Diagrama de Sequencias" width="350px" src="">
+<img alt="Imagem de um Diagrama de Sequencia" title="Diagrama de Sequencias" width="350px" src="https://github.com/jciterceros/VR_Integrador/blob/29ba0a4e876308ecca858e8c7a4ee4e09c101df3/Sistema_de_Vendas/Diagrama%20de%20sequencia.png">
 </div>
 
 #### Classes e Métodos no Caso de Uso "Realizar Pedido"
