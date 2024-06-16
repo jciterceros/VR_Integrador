@@ -1,7 +1,49 @@
 @startuml
-class A {
-  + int a
-  + int b
-  + int c
+class Cliente {
+  - nome: String
+  - email: String
+  - telefone: String
+  + realizarPedido()
+  + cancelarPedido()
 }
+
+class Produto {
+  - id: int
+  - nome: String
+  - descricao: String
+  - preco: float
+  + atualizarEstoque()
+  + aplicarDesconto()
+}
+
+class Pedido {
+  - id: int
+  - data: Date
+  - total: float
+  + calcularTotal()
+  + adicionarItem()
+  + removerItem()
+}
+
+class ItemPedido {
+  - quantidade: int
+  - precoUnitario: float
+  + calcularSubtotal()
+}
+
+class Pagamento {
+  - id: int
+  - metodo: String
+  - status: String
+  + processarPagamento()
+  + confirmarPagamento()
+}
+
+' Cliente --> Pedido
+' Pedido --> ItemPedido
+' Pedido --> Pagamento
+Cliente "1" -- "0..*" Pedido
+Pedido "1" -- "1..*" ItemPedido
+ItemPedido "1" -- "1" Produto
+Pedido "1" -- "1" Pagamento
 @enduml
