@@ -67,7 +67,7 @@ Definindo cinco entidades principais para o sistema de vendas:
   - `confirmarPagamento()`
 
 <div align="center">
-<img alt="Imagem de um Diagrama de Classes para um Sistema de Vendas" title="Diagrama de Classes Sistema de Vendas" width="350px" src="https://github.com/jciterceros/VR_Integrador/blob/74e305798c90563fb70a50f45d689db8c35c118a/Sistema_de_Vendas/Diagrama%20de%20classes.png">
+<img alt="Imagem de um Diagrama de Classes para um Sistema de Vendas" title="Diagrama de Classes Sistema de Vendas" width="550px" src="https://github.com/jciterceros/VR_Integrador/blob/74e305798c90563fb70a50f45d689db8c35c118a/Sistema_de_Vendas/Diagrama%20de%20classes.png">
 </div>
 
 ## Diagramas de Caso de Uso
