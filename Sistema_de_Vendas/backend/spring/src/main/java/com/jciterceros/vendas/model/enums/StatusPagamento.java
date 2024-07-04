@@ -4,9 +4,14 @@ public enum StatusPagamento {
     INICIADO,
     AGUARDANDO_PAGAMENTO,
     REVISAO,
+    APROVADO,
     PAGO,
     DISPONIVEL,
+    REPROVADO,
     DEVOLVIDO,
     CANCELADO,
-    ESTORNO_VENDEDOR,
+    ESTORNADO,
+    PENDENTE,
+    FALHOU,
+    REEMBOLSADO
 }

@@ -28,94 +28,121 @@ public class Pagamento {
     private MetodoPagamento metodoPagamento;
 
 
-    public void processarPagamento(MetodoPagamento metodo, StatusPagamento statusAtual) {
-        StatusPagamento novoStatus = statusAtual;
+    public StatusPagamento processarPagamento(MetodoPagamento metodo, StatusPagamento statusAtual) {
+        validateInputs(metodo, statusAtual);
+        return switch (metodo) {
+            case CARTAO_CREDITO -> processarCartaoCredito(statusAtual);
+            case CARTAO_DEBITO -> processarCartaoDebito(statusAtual);
+            case PIX -> processarPix(statusAtual);
+            case BOLETO_BANCARIO -> processarBoleto(statusAtual);
+            case DINHEIRO -> processarDinheiro(statusAtual);
+            default -> throw new IllegalArgumentException("Método de pagamento desconhecido: " + metodo);
+        };
+    }
 
-        switch (metodo) {
-            case CARTAO_CREDITO:
-                novoStatus = processarCartaoCredito(statusAtual);
-                break;
-            case CARTAO_DEBITO:
-                novoStatus = processarCartaoDebito(statusAtual);
-                break;
-            case PIX:
-                novoStatus = processarPix(statusAtual);
-                break;
-            case BOLETO_BANCARIO:
-                novoStatus = processarBoleto(statusAtual);
-                break;
-            case DINHEIRO:
-                novoStatus = processarDinheiro(statusAtual);
-                break;
-            default:
-                throw new IllegalArgumentException("Método de pagamento desconhecido: " + metodo);
+    private void validateInputs(MetodoPagamento metodo, StatusPagamento statusAtual) {
+        if (metodo == null) {
+            throw new IllegalArgumentException("Método de pagamento não pode ser nulo");
         }
-
-        System.out.println("Status do pagamento atualizado para: " + novoStatus);
-        statusPagamento = novoStatus;
+        if (statusAtual == null) {
+            throw new IllegalArgumentException("Status de pagamento não pode ser nulo");
+        }
     }
 
     private StatusPagamento processarCartaoCredito(StatusPagamento statusAtual) {
-        switch (statusAtual) {
-            case INICIADO:
-                return StatusPagamento.AGUARDANDO_PAGAMENTO;
-            case AGUARDANDO_PAGAMENTO:
-                return StatusPagamento.REVISAO;
-            case REVISAO:
-                return StatusPagamento.PAGO;
-            case PAGO:
-                return StatusPagamento.DISPONIVEL;
-            default:
-                return statusAtual;
-        }
+        return switch (statusAtual) {
+            case INICIADO -> StatusPagamento.AGUARDANDO_PAGAMENTO;
+            case AGUARDANDO_PAGAMENTO -> {
+                this.dataPagamento = LocalDate.now();
+                yield StatusPagamento.PENDENTE;
+            }
+            case APROVADO -> StatusPagamento.PAGO;
+            case PAGO -> {
+                this.dataConfirmacaoPagamento = LocalDate.now();
+                yield StatusPagamento.DISPONIVEL;
+            }
+            case REPROVADO -> StatusPagamento.FALHOU;
+            case FALHOU -> StatusPagamento.REVISAO;
+            case CANCELADO -> StatusPagamento.DEVOLVIDO;
+            case DEVOLVIDO -> StatusPagamento.ESTORNADO;
+            case ESTORNADO -> StatusPagamento.REEMBOLSADO;
+            default -> statusAtual;
+        };
     }
 
     private StatusPagamento processarCartaoDebito(StatusPagamento statusAtual) {
-        switch (statusAtual) {
-            case INICIADO:
-                return StatusPagamento.PAGO;
-            case PAGO:
-                return StatusPagamento.DISPONIVEL;
-            default:
-                return statusAtual;
-        }
+        return switch (statusAtual) {
+            case INICIADO -> StatusPagamento.AGUARDANDO_PAGAMENTO;
+            case AGUARDANDO_PAGAMENTO -> {
+                this.dataPagamento = LocalDate.now();
+                yield StatusPagamento.PENDENTE;
+            }
+            case PAGO -> {
+                this.dataConfirmacaoPagamento = LocalDate.now();
+                yield StatusPagamento.DISPONIVEL;
+            }
+            case FALHOU -> StatusPagamento.CANCELADO;
+            case DEVOLVIDO -> StatusPagamento.ESTORNADO;
+            default -> statusAtual;
+        };
     }
 
     private StatusPagamento processarPix(StatusPagamento statusAtual) {
-        switch (statusAtual) {
-            case INICIADO:
-                return StatusPagamento.PAGO;
-            case PAGO:
-                return StatusPagamento.DISPONIVEL;
-            default:
-                return statusAtual;
-        }
+        return switch (statusAtual) {
+            case INICIADO -> StatusPagamento.AGUARDANDO_PAGAMENTO;
+            case AGUARDANDO_PAGAMENTO -> {
+                this.dataPagamento = LocalDate.now();
+                yield StatusPagamento.PENDENTE;
+            }
+            case PAGO -> {
+                this.dataConfirmacaoPagamento = LocalDate.now();
+                yield StatusPagamento.DISPONIVEL;
+            }
+            case FALHOU -> StatusPagamento.CANCELADO;
+            case DEVOLVIDO -> StatusPagamento.ESTORNADO;
+            default -> statusAtual;
+        };
     }
 
     private StatusPagamento processarBoleto(StatusPagamento statusAtual) {
-        switch (statusAtual) {
-            case INICIADO:
-                return StatusPagamento.AGUARDANDO_PAGAMENTO;
-            case AGUARDANDO_PAGAMENTO:
-                return StatusPagamento.PAGO;
-            case PAGO:
-                return StatusPagamento.DISPONIVEL;
-            default:
-                return statusAtual;
-        }
+        return switch (statusAtual) {
+            case INICIADO -> StatusPagamento.AGUARDANDO_PAGAMENTO;
+            case AGUARDANDO_PAGAMENTO -> {
+                this.dataPagamento = LocalDate.now();
+                yield StatusPagamento.PENDENTE;
+            }
+            case APROVADO -> StatusPagamento.PAGO;
+            case PAGO -> {
+                this.dataConfirmacaoPagamento = LocalDate.now();
+                yield StatusPagamento.DISPONIVEL;
+            }
+            case REPROVADO -> StatusPagamento.FALHOU;
+            case FALHOU -> StatusPagamento.CANCELADO;
+            case DEVOLVIDO -> StatusPagamento.ESTORNADO;
+            default -> statusAtual;
+        };
     }
 
     private StatusPagamento processarDinheiro(StatusPagamento statusAtual) {
-        switch (statusAtual) {
-            case INICIADO:
-                return StatusPagamento.PAGO;
-            case PAGO:
-                return StatusPagamento.DISPONIVEL;
-            default:
-                return statusAtual;
-        }
+        return switch (statusAtual) {
+            case INICIADO -> StatusPagamento.AGUARDANDO_PAGAMENTO;
+            case AGUARDANDO_PAGAMENTO -> {
+                this.dataPagamento = LocalDate.now();
+                yield StatusPagamento.PENDENTE;
+            }
+            case PAGO -> {
+                this.dataConfirmacaoPagamento = LocalDate.now();
+                yield StatusPagamento.DISPONIVEL;
+            }
+            case FALHOU -> StatusPagamento.CANCELADO;
+            default -> statusAtual;
+        };
     }
 
+    // TODO: Verificar se o Metodo confirmarPagamento é necessário
     public void confirmarPagamento() {
+        if (this.statusPagamento == StatusPagamento.PAGO) {
+            this.statusPagamento = StatusPagamento.DISPONIVEL;
+        }
     }
 }

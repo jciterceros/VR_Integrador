@@ -5,5 +5,6 @@ public enum MetodoPagamento {
     CARTAO_DEBITO,
     PIX,
     BOLETO_BANCARIO,
-    DINHEIRO
+    DINHEIRO,
+    BITCOIN
 }

@@ -2,12 +2,14 @@ package com.jciterceros.vendas.model;
 
 import com.jciterceros.vendas.model.enums.MetodoPagamento;
 import com.jciterceros.vendas.model.enums.StatusPagamento;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PagamentoTest {
 
@@ -62,81 +64,165 @@ class PagamentoTest {
     }
 
     @Test
-    void testProcessarPagamento() {
+    @DisplayName("Teste de processamento de pagamento com cartão de crédito")
+    void testProcessarCartaoCredito() {
         Pagamento pagamento = new Pagamento();
-
-        // PAGO
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_DEBITO);
-        pagamento.setStatusPagamento(StatusPagamento.INICIADO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.PAGO, pagamento.getStatusPagamento());
-
-        pagamento.setMetodoPagamento(MetodoPagamento.PIX);
-        pagamento.setStatusPagamento(StatusPagamento.INICIADO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.PAGO, pagamento.getStatusPagamento());
-
-        pagamento.setMetodoPagamento(MetodoPagamento.DINHEIRO);
-        pagamento.setStatusPagamento(StatusPagamento.INICIADO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.PAGO, pagamento.getStatusPagamento());
-
-        // AGUARDANDO_PAGAMENTO
         pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
-        pagamento.setStatusPagamento(StatusPagamento.INICIADO);
+        StatusPagamento statusAtual;
 
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.getStatusPagamento());
+        statusAtual = StatusPagamento.INICIADO;
+        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.setMetodoPagamento(MetodoPagamento.BOLETO_BANCARIO);
-        pagamento.setStatusPagamento(StatusPagamento.INICIADO);
+        statusAtual = StatusPagamento.AGUARDANDO_PAGAMENTO;
+        assertEquals(StatusPagamento.PENDENTE, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.getStatusPagamento());
+        statusAtual = StatusPagamento.APROVADO;
+        assertEquals(StatusPagamento.PAGO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        // REVISAO
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
-        pagamento.setStatusPagamento(StatusPagamento.AGUARDANDO_PAGAMENTO);
+        statusAtual = StatusPagamento.PAGO;
+        assertEquals(StatusPagamento.DISPONIVEL, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.REVISAO, pagamento.getStatusPagamento());
+        statusAtual = StatusPagamento.REPROVADO;
+        assertEquals(StatusPagamento.FALHOU, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        // DISPONIVEL
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
-        pagamento.setStatusPagamento(StatusPagamento.PAGO);
+        statusAtual = StatusPagamento.FALHOU;
+        assertEquals(StatusPagamento.REVISAO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.DISPONIVEL, pagamento.getStatusPagamento());
+        statusAtual = StatusPagamento.CANCELADO;
+        assertEquals(StatusPagamento.DEVOLVIDO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_DEBITO);
-        pagamento.setStatusPagamento(StatusPagamento.PAGO);
+        statusAtual = StatusPagamento.DEVOLVIDO;
+        assertEquals(StatusPagamento.ESTORNADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
 
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.DISPONIVEL, pagamento.getStatusPagamento());
-
-        pagamento.setMetodoPagamento(MetodoPagamento.PIX);
-        pagamento.setStatusPagamento(StatusPagamento.PAGO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.DISPONIVEL, pagamento.getStatusPagamento());
-
-        pagamento.setMetodoPagamento(MetodoPagamento.BOLETO_BANCARIO);
-        pagamento.setStatusPagamento(StatusPagamento.PAGO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.DISPONIVEL, pagamento.getStatusPagamento());
-
-        pagamento.setMetodoPagamento(MetodoPagamento.DINHEIRO);
-        pagamento.setStatusPagamento(StatusPagamento.PAGO);
-
-        pagamento.processarPagamento(pagamento.getMetodoPagamento(), pagamento.getStatusPagamento());
-        assertEquals(StatusPagamento.DISPONIVEL, pagamento.getStatusPagamento());
-
-        // TODO: DEVOLVIDO, CANCELADO, ESTORNO_VENDEDOR
-
+        statusAtual = StatusPagamento.ESTORNADO;
+        assertEquals(StatusPagamento.REEMBOLSADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
     }
 
+    @Test
+    @DisplayName("Teste de processamento de pagamento com cartão de débito")
+    void testProcessarCartaoDebito() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_DEBITO);
+        StatusPagamento statusAtual;
+
+        statusAtual = StatusPagamento.INICIADO;
+        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.AGUARDANDO_PAGAMENTO;
+        assertEquals(StatusPagamento.PENDENTE, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.PAGO;
+        assertEquals(StatusPagamento.DISPONIVEL, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.FALHOU;
+        assertEquals(StatusPagamento.CANCELADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.DEVOLVIDO;
+        assertEquals(StatusPagamento.ESTORNADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com PIX")
+    void testProcessarPix() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.PIX);
+        StatusPagamento statusAtual;
+
+        statusAtual = StatusPagamento.INICIADO;
+        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.AGUARDANDO_PAGAMENTO;
+        assertEquals(StatusPagamento.PENDENTE, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.PAGO;
+        assertEquals(StatusPagamento.DISPONIVEL, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.FALHOU;
+        assertEquals(StatusPagamento.CANCELADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.DEVOLVIDO;
+        assertEquals(StatusPagamento.ESTORNADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com boleto bancário")
+    void testProcessarBoleto() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.BOLETO_BANCARIO);
+        StatusPagamento statusAtual;
+
+        statusAtual = StatusPagamento.INICIADO;
+        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.AGUARDANDO_PAGAMENTO;
+        assertEquals(StatusPagamento.PENDENTE, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.APROVADO;
+        assertEquals(StatusPagamento.PAGO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.PAGO;
+        assertEquals(StatusPagamento.DISPONIVEL, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.REPROVADO;
+        assertEquals(StatusPagamento.FALHOU, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.FALHOU;
+        assertEquals(StatusPagamento.CANCELADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.DEVOLVIDO;
+        assertEquals(StatusPagamento.ESTORNADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com dinheiro")
+    void testProcessarDinheiro() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.DINHEIRO);
+        StatusPagamento statusAtual;
+
+        statusAtual = StatusPagamento.INICIADO;
+        assertEquals(StatusPagamento.AGUARDANDO_PAGAMENTO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.AGUARDANDO_PAGAMENTO;
+        assertEquals(StatusPagamento.PENDENTE, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.PAGO;
+        assertEquals(StatusPagamento.DISPONIVEL, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+
+        statusAtual = StatusPagamento.FALHOU;
+        assertEquals(StatusPagamento.CANCELADO, pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com método de pagamento nulo")
+    void testProcessarPagamentoMetodoNulo() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(null);
+        StatusPagamento statusAtual = StatusPagamento.INICIADO;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        assertEquals("Método de pagamento não pode ser nulo", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com status de pagamento nulo")
+    void testProcessarPagamentoStatusNulo() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
+        StatusPagamento statusAtual = null;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        assertEquals("Status de pagamento não pode ser nulo", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("Teste de processamento de pagamento com status de pagamento desconhecido")
+    void testProcessarPagamentoStatusDesconhecido() {
+        Pagamento pagamento = new Pagamento();
+        pagamento.setMetodoPagamento(MetodoPagamento.BITCOIN);
+        StatusPagamento statusAtual = StatusPagamento.FALHOU;
+
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        assertEquals("Método de pagamento desconhecido: BITCOIN", exception.getMessage());
+    }
 }
