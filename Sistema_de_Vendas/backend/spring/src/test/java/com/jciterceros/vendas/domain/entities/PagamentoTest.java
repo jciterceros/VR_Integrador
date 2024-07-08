@@ -5,6 +5,7 @@ import com.jciterceros.vendas.domain.entities.enums.StatusPagamento;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -214,11 +215,14 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com método de pagamento nulo")
     void testProcessarPagamentoMetodoNulo() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(null);
-        StatusPagamento statusAtual = StatusPagamento.INICIADO;
+        StatusPagamento statusInicial = StatusPagamento.INICIADO;
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(null, statusInicial));
         assertEquals("Método de pagamento não pode ser nulo", exception.getMessage());
+    }
+
+    private Executable getProcessarPagamento(Pagamento pagamento, StatusPagamento statusAtual) {
+        return () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual);
     }
 
     @Test
@@ -226,9 +230,8 @@ class PagamentoTest {
     void testProcessarPagamentoStatusNulo() {
         Pagamento pagamento = new Pagamento();
         pagamento.setMetodoPagamento(cartaoCreditoStrategy);
-        StatusPagamento statusAtual = null;
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        Exception exception = assertThrows(IllegalArgumentException.class, getProcessarPagamento(pagamento, null));
         assertEquals("Status de pagamento não pode ser nulo", exception.getMessage());
     }
 
@@ -239,7 +242,7 @@ class PagamentoTest {
         pagamento.setMetodoPagamento(bitCoinStrategy);
         StatusPagamento statusAtual = StatusPagamento.ERROR;
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
+        Exception exception = assertThrows(IllegalArgumentException.class, getProcessarPagamento(pagamento, statusAtual));
         assertEquals("Status de pagamento não pode ser ERROR", exception.getMessage());
     }
 }
