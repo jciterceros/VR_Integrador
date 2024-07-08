@@ -1,4 +1,4 @@
-package com.jciterceros.vendas.model.enums;
+package com.jciterceros.vendas.domain.entities.enums;
 
 public enum StatusPagamento {
     INICIADO,
@@ -13,5 +13,6 @@ public enum StatusPagamento {
     ESTORNADO,
     PENDENTE,
     FALHOU,
-    REEMBOLSADO
+    REEMBOLSADO,
+    ERROR
 }

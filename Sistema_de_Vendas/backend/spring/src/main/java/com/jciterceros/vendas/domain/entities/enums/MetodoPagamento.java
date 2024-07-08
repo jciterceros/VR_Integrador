@@ -1,4 +1,4 @@
-package com.jciterceros.vendas.model.enums;
+package com.jciterceros.vendas.domain.entities.enums;
 
 public enum MetodoPagamento {
     CARTAO_CREDITO,
@@ -6,5 +6,6 @@ public enum MetodoPagamento {
     PIX,
     BOLETO_BANCARIO,
     DINHEIRO,
-    BITCOIN
+    BITCOIN,
+    DESCONHECIDO
 }

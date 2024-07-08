@@ -1,7 +1,8 @@
-package com.jciterceros.vendas.model;
+package com.jciterceros.vendas.domain.entities;
 
-import com.jciterceros.vendas.model.enums.MetodoPagamento;
-import com.jciterceros.vendas.model.enums.StatusPagamento;
+import com.jciterceros.vendas.application.abstractions.*;
+import com.jciterceros.vendas.domain.entities.enums.StatusPagamento;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -12,6 +13,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PagamentoTest {
+    private MetodoPagamentoStrategy cartaoCreditoStrategy;
+    private MetodoPagamentoStrategy cartaoDebitoStrategy;
+    private MetodoPagamentoStrategy pixStrategy;
+    private MetodoPagamentoStrategy boletoBancarioStrategy;
+    private MetodoPagamentoStrategy dinheiroStrategy;
+    private MetodoPagamentoStrategy bitCoinStrategy;
+
+    @BeforeEach
+    void setUp() {
+        cartaoCreditoStrategy = new CartaoCreditoStrategy();
+        cartaoDebitoStrategy = new CartaoDebitoStrategy();
+        pixStrategy = new PixStrategy();
+        boletoBancarioStrategy = new BoletoBancarioStrategy();
+        dinheiroStrategy = new DinheiroStrategy();
+        bitCoinStrategy = new BitCoinStrategy();
+    }
 
     @Test
     void testConstructor() {
@@ -21,7 +38,7 @@ class PagamentoTest {
         LocalDate dataPagamento = LocalDate.now();
         LocalDate dataConfirmacaoPagamento = LocalDate.now().plusDays(1);
         StatusPagamento statusPagamento = StatusPagamento.INICIADO;
-        MetodoPagamento metodoPagamento = MetodoPagamento.CARTAO_CREDITO;
+        MetodoPagamentoStrategy metodoPagamento = cartaoCreditoStrategy;
 
         Pagamento pagamento = new Pagamento(id, numeroPedido, valor, dataPagamento, dataConfirmacaoPagamento, statusPagamento, metodoPagamento);
 
@@ -44,7 +61,7 @@ class PagamentoTest {
         LocalDate dataPagamento = LocalDate.now();
         LocalDate dataConfirmacaoPagamento = LocalDate.now().plusDays(1);
         StatusPagamento statusPagamento = StatusPagamento.INICIADO;
-        MetodoPagamento metodoPagamento = MetodoPagamento.CARTAO_CREDITO;
+        MetodoPagamentoStrategy metodoPagamento = cartaoCreditoStrategy;
 
         pagamento.setId(id);
         pagamento.setNumeroPedido(numeroPedido);
@@ -67,7 +84,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com cartão de crédito")
     void testProcessarCartaoCredito() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
+        pagamento.setMetodoPagamento(cartaoCreditoStrategy);
         StatusPagamento statusAtual;
 
         statusAtual = StatusPagamento.INICIADO;
@@ -102,7 +119,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com cartão de débito")
     void testProcessarCartaoDebito() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_DEBITO);
+        pagamento.setMetodoPagamento(cartaoDebitoStrategy);
         StatusPagamento statusAtual;
 
         statusAtual = StatusPagamento.INICIADO;
@@ -125,7 +142,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com PIX")
     void testProcessarPix() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.PIX);
+        pagamento.setMetodoPagamento(pixStrategy);
         StatusPagamento statusAtual;
 
         statusAtual = StatusPagamento.INICIADO;
@@ -148,7 +165,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com boleto bancário")
     void testProcessarBoleto() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.BOLETO_BANCARIO);
+        pagamento.setMetodoPagamento(boletoBancarioStrategy);
         StatusPagamento statusAtual;
 
         statusAtual = StatusPagamento.INICIADO;
@@ -177,7 +194,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com dinheiro")
     void testProcessarDinheiro() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.DINHEIRO);
+        pagamento.setMetodoPagamento(dinheiroStrategy);
         StatusPagamento statusAtual;
 
         statusAtual = StatusPagamento.INICIADO;
@@ -208,7 +225,7 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com status de pagamento nulo")
     void testProcessarPagamentoStatusNulo() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.CARTAO_CREDITO);
+        pagamento.setMetodoPagamento(cartaoCreditoStrategy);
         StatusPagamento statusAtual = null;
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
@@ -219,10 +236,10 @@ class PagamentoTest {
     @DisplayName("Teste de processamento de pagamento com status de pagamento desconhecido")
     void testProcessarPagamentoStatusDesconhecido() {
         Pagamento pagamento = new Pagamento();
-        pagamento.setMetodoPagamento(MetodoPagamento.BITCOIN);
-        StatusPagamento statusAtual = StatusPagamento.FALHOU;
+        pagamento.setMetodoPagamento(bitCoinStrategy);
+        StatusPagamento statusAtual = StatusPagamento.ERROR;
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> pagamento.processarPagamento(pagamento.getMetodoPagamento(), statusAtual));
-        assertEquals("Método de pagamento desconhecido: BITCOIN", exception.getMessage());
+        assertEquals("Status de pagamento não pode ser ERROR", exception.getMessage());
     }
 }

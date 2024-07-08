@@ -1,4 +1,4 @@
-package com.jciterceros.vendas.model.enums;
+package com.jciterceros.vendas.domain.entities.enums;
 
 public enum StatusPedido {
     AGUARDANDO_PAGAMENTO,

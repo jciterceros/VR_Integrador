@@ -1,5 +1,6 @@
-package com.jciterceros.vendas.model;
+package com.jciterceros.vendas.domain.entities;
 
+import com.jciterceros.vendas.domain.entities.Produto;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

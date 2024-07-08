@@ -1,0 +1,2 @@
+Camada de Domínio (Domain)
+A camada de domínio é o coração do aplicativo e contém as regras de negócios principais. Aqui, definimos entidades, objetos de valor, agregados, eventos de domínio, exceções e interfaces de repositório.

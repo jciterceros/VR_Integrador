@@ -1,4 +1,4 @@
-package com.jciterceros.vendas.model;
+package com.jciterceros.vendas.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
